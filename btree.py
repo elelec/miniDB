@@ -11,6 +11,10 @@ class Node:
 				 left_sibling=None, right_sibling=None, parent=None, is_leaf=False):
 		self.b = b # branching factor
 		self.values = values # Values (the data from the pk column)
+		self.indices = []
+		for i in range(0, len(values)):
+			self.indices.append(Extend.MultiIndex)
+		
 		self.ptrs = ptrs # ptrs (the indexes of each datapoint or the index of another bucket)
 		self.left_sibling = left_sibling # the index of a buckets left sibling
 		self.right_sibling = right_sibling # the index of a buckets right sibling
@@ -62,12 +66,14 @@ class Node:
 
 				self.values.insert(index, value)
 				self.ptrs.insert(index+1, ptr)
+				self.indices.append(Extend.MultiIndex())
 
 				if ptr1:
 					self.ptrs.insert(index+1, ptr1)
 				return
 		self.values.append(value)
 		self.ptrs.append(ptr)
+		self.indices.append(Extend.MultiIndex())
 		if ptr1:
 			self.ptrs.append(ptr1)
 
@@ -213,6 +219,9 @@ class Btree:
 
 	def delete(self, value):
 		Extend.delete(self, value)
+		
+	def setColumn(self, nodeValue, columnIndex, columnValue):
+		Extend.setColumn(self, nodeValue, columnIndex, columnValue)
 
 
 

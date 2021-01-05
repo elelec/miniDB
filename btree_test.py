@@ -44,6 +44,7 @@ for ind, el in enumerate(lst):
 
 bt.plot("Pre")
 bt.delete(20)
+bt.setColumn(13, "Students", 14)
 bt.plot("Post")
 
 #bt.show()

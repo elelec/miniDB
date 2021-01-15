@@ -1,18 +1,19 @@
 from btree import Btree
-from random import randrange
+from random import randrange, choice
 import sys
+from time import sleep
 '''
 Test the Btree
 '''
 
 
-NUM = min(int(sys.argv[1]), 30)
+NUM = int(sys.argv[1])
 B = int(sys.argv[2])
 
 lst = []
 
 while len(lst)!=NUM:
-	new_v = randrange(30)
+	new_v = randrange(NUM)
 	if new_v not in lst:
 		lst.append(new_v)
 
@@ -43,8 +44,21 @@ for ind, el in enumerate(lst):
 
 
 bt.plot("Pre")
-bt.delete(20)
-bt.setColumn(13, "Students", 14)
+i = 0
+for q in range(0, 5):
+	n = randrange(NUM)
+	
+	if bt.delete(n) == True:
+		i = i + 1
+		bt.plot("/Step " + str(i))
+		print("Step " + str(i))
+		sleep(0.2)
+		print("--------")
+	#else:
+	#	sleep(0.02)
+	
+#bt.delete(2)
+#bt.setColumn(1, "Students", 14)
 bt.plot("Post")
 
 #bt.show()

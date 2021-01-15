@@ -49,7 +49,7 @@ class Node:
 			return self.ptrs[-1]
 
 
-	def insert(self, value, ptr, ptr1=None):
+	def insert(self, value, ptr, ptr1=None, index = Extend.MultiIndex()):
 		'''
 		Insert the value and its ptr/s to the appropriate place (node wise).
 		User can input two ptrs to insert to a non leaf node.
@@ -73,7 +73,7 @@ class Node:
 				return
 		self.values.append(value)
 		self.ptrs.append(ptr)
-		self.indices.append(Extend.MultiIndex())
+		self.indices.append(index)
 		if ptr1:
 			self.ptrs.append(ptr1)
 
@@ -95,6 +95,16 @@ class Node:
 
 
 class Btree:
+
+	def merge(self, node_left, node_right, oldParValue = None):
+		Extend.merge(self, node_left, node_right, oldParValue)
+
+	def delete(self, value):
+		return Extend.delete(self, value)
+		
+	def setColumn(self, nodeValue, columnIndex, columnValue):
+		Extend.setColumn(self, nodeValue, columnIndex, columnValue)
+	
 	def __init__(self, b):
 		'''
 		The tree abstraction.
@@ -127,7 +137,6 @@ class Btree:
 	def _search(self, value, return_ops=False):
 		'''
 		Returns the index of the node that the given value exist or should exist in.
-
 		value: the value that we are searching for
 		return_ops: set to True if you want to use the number of operations (for benchmarking)
 		'''
@@ -148,6 +157,7 @@ class Btree:
 		else:
 			return self.nodes.index(node)
 
+
 	def split(self, node_id):
 		'''
 		Split the node with index=node_id
@@ -160,7 +170,7 @@ class Btree:
 			# if the node is a leaf, the parent value should be a part of the new node (right)
 			# Important: in a b+tree, every value should appear in a leaf
 			right_values = node.values[len(node.values)//2:]
-			right_ptrs	 = node.ptrs[len(node.ptrs)//2:]
+			right_ptrs   = node.ptrs[len(node.ptrs)//2:]
 
 			# create the new node with the right half of the old nodes values and ptrs (including the middle ones)
 			right = Node(self.b, right_values, right_ptrs,\
@@ -176,7 +186,10 @@ class Btree:
 		else:
 			# if the node is not a leaf, the parent value shoudl NOT be part of the new node
 			right_values = node.values[len(node.values)//2+1:]
-			right_ptrs	 = node.ptrs[len(node.ptrs)//2:]
+			if self.b%2==1:
+				right_ptrs = node.ptrs[len(node.ptrs)//2:]
+			else:
+				right_ptrs = node.ptrs[len(node.ptrs)//2+1:]
 
 			# if nonleafs should be connected change the following two lines and add siblings
 			right = Node(self.b, right_values, right_ptrs,\
@@ -189,7 +202,10 @@ class Btree:
 
 		# old node (left) keeps only the first half of the values/ptrs
 		node.values = node.values[:len(node.values)//2]
-		node.ptrs = node.ptrs[:len(node.ptrs)//2]
+		if self.b%2==1:
+			node.ptrs = node.ptrs[:len(node.ptrs)//2]
+		else:
+			node.ptrs = node.ptrs[:len(node.ptrs)//2+1]
 
 		# append the new node (right) to the nodes list
 		self.nodes.append(right)
@@ -214,14 +230,6 @@ class Btree:
 			if len(self.nodes[node.parent].values)==self.b:
 				self.split(node.parent)
 
-	def merge(self, node_left, node_right, oldParValue = None):
-		Extend.merge(self, node_left, node_right, oldParValue)
-
-	def delete(self, value):
-		Extend.delete(self, value)
-		
-	def setColumn(self, nodeValue, columnIndex, columnValue):
-		Extend.setColumn(self, nodeValue, columnIndex, columnValue)
 
 
 
@@ -240,6 +248,45 @@ class Btree:
 			print(f'## {ptr} ##')
 			self.nodes[ptr].show()
 			print('----')
+
+
+	def plot(self):
+		## arrange the nodes top to bottom left to right
+		nds = []
+		nds.append(self.root)
+		for ptr in nds:
+			if self.nodes[ptr].is_leaf:
+				continue
+			nds.extend(self.nodes[ptr].ptrs)
+
+		# add each node and each link
+		g = 'digraph G{\nforcelabels=true;\n'
+
+		for i in nds:
+			node = self.nodes[i]
+			g+=f'{i} [label="{node.values}"]\n'
+			if node.is_leaf:
+				continue
+				# if node.left_sibling is not None:
+				#     g+=f'"{node.values}"->"{self.nodes[node.left_sibling].values}" [color="blue" constraint=false];\n'
+				# if node.right_sibling is not None:
+				#     g+=f'"{node.values}"->"{self.nodes[node.right_sibling].values}" [color="green" constraint=false];\n'
+				#
+				# g+=f'"{node.values}"->"{self.nodes[node.parent].values}" [color="red" constraint=false];\n'
+			else:
+				for child in node.ptrs:
+					g+=f'{child} [label="{self.nodes[child].values}"]\n'
+					g+=f'{i}->{child};\n'
+		g +="}"
+
+		try:
+			from graphviz import Source
+			src = Source(g)
+			src.render('bplustree', view=True)
+		except ImportError:
+			print('"graphviz" package not found. Writing to graph.gv.')
+			with open('graph.gv','w') as f:
+				f.write(g)
 
 	def plot(self, suffix = ""):
 		## arrange the nodes top to bottom left to right

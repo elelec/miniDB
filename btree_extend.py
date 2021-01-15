@@ -6,13 +6,14 @@ class MultiIndex:
 	def __init__(self):
 		self.indices = []
 	
-	def setMultiIndex(self, name, value):
+	def setMultiIndex(self, name, value, type):
 		for i in self.indices:
 			if i.name == name:
 				i.value = value
+				i.type = type
 				return
 		
-		self.indices.append(Index(name, value))
+		self.indices.append(Index(name, value, type))
 		#print(self.indices[-1].name)
 	
 	def removeMultiIndex(self, name):
@@ -24,10 +25,12 @@ class Index:
 	
 	name = ""
 	value = 0
+	type = "str"
 	
-	def __init__(self, name, value):
+	def __init__(self, name, value. type):
 		self.name = name
 		self.value = value
+		self.type = type
 
 
 # Node
@@ -45,7 +48,7 @@ def remove(self, value):
 
 # Btree
 
-def setColumn(self, nodeValue, columnName, columnValue):
+def setColumn(self, nodeValue, columnName, columnValue, columnType):
 	index = self._search(nodeValue)
 	
 	if index != None:
@@ -53,7 +56,18 @@ def setColumn(self, nodeValue, columnName, columnValue):
 		index = node.values.index(nodeValue)
 		
 		if (index != None):
-			node.indices[index].setMultiIndex(node.indices[index], columnName, columnValue)
+			node.indices[index].setMultiIndex(node.indices[index], columnName, columnValue, columnType)
+			print(node.indices[index].indices[-1].name + ", " + str(node.indices[index].indices[-1].value))
+
+def removeColumn(self, nodeValue, columnName):
+	index = self._search(nodeValue)
+	
+	if index != None:
+		node = self.nodes[index]
+		index = node.values.index(nodeValue)
+		
+		if (index != None):
+			node.indices[index].removeMultiIndex(node.indices[index], columnName)
 			print(node.indices[index].indices[-1].name + ", " + str(node.indices[index].indices[-1].value))
 
 def merge(self, node_left, node_right, oldParValue = None):

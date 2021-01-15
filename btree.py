@@ -105,6 +105,9 @@ class Btree:
 	def setColumn(self, nodeValue, columnIndex, columnValue):
 		Extend.setColumn(self, nodeValue, columnIndex, columnValue)
 	
+	def removeColumn(self, nodeValue, columnName):
+		removeColumn(self, nodeValue, column)
+	
 	def __init__(self, b):
 		'''
 		The tree abstraction.

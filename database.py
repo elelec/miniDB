@@ -544,6 +544,7 @@ class Database:
         # for each record in the primary key of the table, insert its value and index to the btree
         for idx, key in enumerate(self.tables[table_name].columns[self.tables[table_name].pk_idx]):
             bt.insert(key, idx)
+            bt.setColumn(key, table_name, "", "")
         # save the btree
         self._save_index(index_name, bt)
 

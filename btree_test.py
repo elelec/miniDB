@@ -20,7 +20,7 @@ while len(lst)!=NUM:
 
 # To test script changes with the same sequence, saving to a file is allowed
 print(len(sys.argv))
-if len(sys.argv) < 3 or sys.argv[3] != "load":
+if len(sys.argv) < 4 or sys.argv[3] != "load":
 	dataBack = open('lastLine.txt', 'w')
 	for i in lst:
 		dataBack.writelines(str(i) + "\n")

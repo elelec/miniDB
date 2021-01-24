@@ -27,7 +27,7 @@ class Index:
 	value = 0
 	type = "str"
 	
-	def __init__(self, name, value. type):
+	def __init__(self, name, value):
 		self.name = name
 		self.value = value
 		self.type = type
